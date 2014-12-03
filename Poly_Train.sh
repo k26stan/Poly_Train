@@ -65,11 +65,11 @@ GENE_TABLE=/home/kstandis/HandyStuff/GG-Gene_Names_DB.txt
 
 ## Custom Scripts
 POLY_DIR=/projects/janssen/Poly_Train/SCRIPTS
-2_SAMPLE_PHENO_R=${POLY_DIR}/2-Sample_Pheno.R
-5_MAKE_COV_TAB_R=${POLY_DIR}/5-Make_Cov_Table.R
-8_MANHAT_PLOT_R=${POLY_DIR}/8-Manhat_Plot.R
-10_GET_PLINK_DAT_PY=${POLY_DIR}/10-Get_Plink_Dat.py
-10_COMPILE_OUTS_R=${POLY_DIR}/10-Compile_Outs.R
+s2_SAMPLE_PHENO_R=${POLY_DIR}/2-Sample_Pheno.R
+s5_MAKE_COV_TAB_R=${POLY_DIR}/5-Make_Cov_Table.R
+s8_MANHAT_PLOT_R=${POLY_DIR}/8-Manhat_Plot.R
+s10_GET_PLINK_DAT_PY=${POLY_DIR}/10-Get_Plink_Dat.py
+s10_COMPILE_OUTS_R=${POLY_DIR}/10-Compile_Outs.R
 
 ###########################################################
 ## Pull some Info out of Parameters ##
@@ -144,7 +144,7 @@ echo `date` "2 - Sample Training/Test Sets" >> ${UPDATE_FILE}
 
 ## Take in Phenotype File
  # Spit out 2 separate Phenotype Files (Training/Test Sets)
-Rscript ${2_SAMPLE_PHENO_R} ${PHENO_FILE} ${PHENO_SETS}
+Rscript ${s2_SAMPLE_PHENO_R} ${PHENO_FILE} ${PHENO_SETS}
 
 ## Done
 echo `date` "2 - Sample Training/Test Sets - DONE" >> ${UPDATE_FILE}
@@ -219,7 +219,7 @@ if [ $COV_FILE = "F" ] ; then
 	cp ${EIG_VEC} ${NEW_COV_FILE}
 else
 	# Make new Covariate File
-	Rscript ${5_MAKE_COV_TAB_R} ${EIG_VEC} ${COV_FILE} ${NEW_COV_FILE}
+	Rscript ${s5_MAKE_COV_TAB_R} ${EIG_VEC} ${COV_FILE} ${NEW_COV_FILE}
 fi
 
 ## Done
@@ -263,7 +263,7 @@ echo \### Pull out Results for QQ/Manhat Plots \###
 echo `date` "7 - Pull out Results for QQ/Manhat Plots" >> ${UPDATE_FILE}
 
 ## Pull out just the p-values & identifying information
-cat ${ASSOC_FILE}.assoc.${SUFFIX} | awk '{print $1"\t"$2"\t"$3"\t"$9}' > ${P_FILE}
+cat ${ASSOC_TR}.assoc.${SUFFIX} | awk '{print $1"\t"$2"\t"$3"\t"$9}' > ${P_FILE}
 
 ## Done
 echo `date` "7 - Pull out GWAS Results on Training Set - DONE" >> ${UPDATE_FILE}
@@ -282,7 +282,7 @@ echo \### Make Manhattan and QQ Plots \###
 echo `date` "8 - Make Manhattan and QQ Plots" >> ${UPDATE_FILE}
 
 ## Make Manhattan/QQ plots & Candidate Table of SNPs beyond Threshold
-Rscript ${8_MANHAT_PLOT_R} ${P_FILE} ${PHENO} ${COVS_FILENAME}
+Rscript ${s8_MANHAT_PLOT_R} ${P_FILE} ${PHENO} ${COVS_FILENAME}
 
 ## Done
 echo `date` "8 - Make Manhattan and QQ Plots - DONE" >> ${UPDATE_FILE}
@@ -329,12 +329,12 @@ echo `date` "10 - Compile Stats and Annotations" >> ${UPDATE_FILE}
 cat ${CND_ANNOTS} | cut -d$'\t' -f2-7,20-22,24,46-50,54,64,68,70,74,78-80,100-101,105  > ${CND_GENES}
 
 ## Use Python to Pull Info from Multiple Files
-python ${10_GET_PLINK_DAT_PY} ${CND_FILE} \
-${ASSOC_FILE}.hwe ${ASSOC_FILE}.assoc.linear.adjusted ${ASSOC_FILE}.frqx ${ASSOC_FILE}.assoc.linear \
+python ${s10_GET_PLINK_DAT_PY} ${CND_FILE} \
+${ASSOC_TR}.hwe ${ASSOC_TR}.assoc.linear.adjusted ${ASSOC_TR}.frqx ${ASSOC_TR}.assoc.linear \
 ${CND_FILE%%txt}hwe ${CND_FILE%%txt}adj ${CND_FILE%%txt}frqx ${CND_FILE%%txt}pv
 
 ## Use Rscript to Pull Together Desired Info
-Rscript ${10_COMPILE_OUTS_R} ${CND_FILE} ${CND_FILE%%txt}hwe ${CND_FILE%%txt}adj ${CND_FILE%%txt}frqx ${CND_FILE%%txt}pv ${CND_GENES} ${CND_ANNOTS}
+Rscript ${s10_COMPILE_OUTS_R} ${CND_FILE} ${CND_FILE%%txt}hwe ${CND_FILE%%txt}adj ${CND_FILE%%txt}frqx ${CND_FILE%%txt}pv ${CND_GENES} ${CND_ANNOTS}
 
 ## Done
 echo `date` "10 - Compile Stats and Annotations - DONE" >> ${UPDATE_FILE}
@@ -381,6 +381,7 @@ echo \### Filter Candidates & Build Model \###
 echo `date` "12 - Filter Candidates & Build Model" >> ${UPDATE_FILE}
 
 
+Rscript 12-Model.R ${PHENO_SETS} ${NEW_COV_FILE} ${CND_FILE%%txt}.compile.short ${CND_012} ${COVS_COMMAND}
 
 
 

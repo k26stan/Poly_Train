@@ -13,6 +13,7 @@ LINE <- commandArgs(trailingOnly = TRUE)
 # LINE <- paste("/projects/janssen/ASSOCIATION/20140625_LT8_DEL_28_BL_DAS_BL_AGESEX_logBMI_COUN_PC1_PC2/CND_LT8_DEL_28_BL_DAS_BL_AGESEX_logBMI_COUN_PC1_PC2.",c("txt","hwe","adj","frqx","pv","Gene.txt","Annot.txt"),sep="")
 # LINE <- paste("/projects/janssen/ASSOCIATION/20140926_LT8_DEL_MNe_MN_DAS_BL_MN_AGESEX_logBMI_COUN_PC1_PC2/CND_LT8_DEL_MNe_MN_DAS_BL_MN_AGESEX_logBMI_COUN_PC1_PC2.",c("txt","hwe","adj","frqx","pv","Gene.txt","Annot.txt"),sep="")
 # LINE <- paste("/projects/janssen/ASSOCIATION/20140926b_LT8_DEL_MNe_MN_DAS_BL_MN_AGESEX_logBMI_COUN_PC1_PC2/CND_LT8_DEL_MNe_MN_DAS_BL_MN_AGESEX_logBMI_COUN_PC1_PC2.",c("txt","hwe","adj","frqx","pv","Gene.txt","Annot.txt"),sep="")
+# LINE <- paste("/projects/janssen/Poly_Train/20141124test_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2/CND_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2.",c("txt","hwe","adj","frqx","pv","Gene.txt","Annot.txt"),sep="")
 PathToTxt <- LINE[1]
 PathToHW <- LINE[2]
 PathToADJ <- LINE[3]
@@ -71,6 +72,9 @@ names(PV_2)[which(names(PV_2)=="P")] <- "P_Assoc_2"
 
 ## Gene Array
 CHR_POS_G <- paste(GENE$Chromosome,":",GENE$Begin,"-",GENE$End,sep="")
+# print( dim(GENE) )
+# print( length(GENE) )
+# print( length(CHR_POS_G) )
 GENE_2 <- data.frame( GENE, CHR_POS=CHR_POS_G )
 # GENE_2 <- GENE[which(GENE$VarType=="snp"),] # GENE_2 <- GENE[which(ANNOT$VarType=="snp"),]
 
@@ -118,7 +122,9 @@ for ( e in 1:length(In_POS_End) ) {
 
  # Remove the Rows in "NO_SNP" that I matched above
 XXXX_ROWS <- which( MG_6[,1]=="XXXX" )
-MG <- MG_6[-XXXX_ROWS,] # length(table( which(is.na(MG),arr.ind=T)[,1] ))
+if ( length(XXXX_ROWS)>0 ) {
+	MG <- MG_6[-XXXX_ROWS,]
+}else{ MG <- MG_6 }
 
 ####################################
 ## FORMAT/ORGANIZE TABLES ##########
