@@ -1,5 +1,6 @@
 ## 12-Model.R ##
 ## R function to Use Training Results and Build Model ##
+## CONTINUOUS Phenotypes ##
 ## Load Phenotype & Covariate Files
 ## Takes in SNP list (_ID.list), *compile.short, and Genotypes (*_012.raw) ##
 ## Puts together Predictive Model ##
