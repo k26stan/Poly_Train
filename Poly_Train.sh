@@ -70,6 +70,8 @@ s5_MAKE_COV_TAB_R=${POLY_DIR}/5-Make_Cov_Table.R
 s8_MANHAT_PLOT_R=${POLY_DIR}/8-Manhat_Plot.R
 s10_GET_PLINK_DAT_PY=${POLY_DIR}/10-Get_Plink_Dat.py
 s10_COMPILE_OUTS_R=${POLY_DIR}/10-Compile_Outs.R
+s12_Model_C_R=${POLY_DIR}/12-Model_C.R
+s12_Model_B_R=${POLY_DIR}/12-Model_B.R
 
 ###########################################################
 ## Pull some Info out of Parameters ##
@@ -330,11 +332,12 @@ cat ${CND_ANNOTS} | cut -d$'\t' -f2-7,20-22,24,46-50,54,64,68,70,74,78-80,100-10
 
 ## Use Python to Pull Info from Multiple Files
 python ${s10_GET_PLINK_DAT_PY} ${CND_FILE} \
-${ASSOC_TR}.hwe ${ASSOC_TR}.assoc.linear.adjusted ${ASSOC_TR}.frqx ${ASSOC_TR}.assoc.linear \
+${ASSOC_TR}.hwe ${ASSOC_TR}.assoc.${SUFFIX}.adjusted ${ASSOC_TR}.frqx ${ASSOC_TR}.assoc.${SUFFIX} \
 ${CND_FILE%%txt}hwe ${CND_FILE%%txt}adj ${CND_FILE%%txt}frqx ${CND_FILE%%txt}pv
+echo \### Done with Python, move to R \###
 
 ## Use Rscript to Pull Together Desired Info
-Rscript ${s10_COMPILE_OUTS_R} ${CND_FILE} ${CND_FILE%%txt}hwe ${CND_FILE%%txt}adj ${CND_FILE%%txt}frqx ${CND_FILE%%txt}pv ${CND_GENES} ${CND_ANNOTS}
+Rscript ${s10_COMPILE_OUTS_R} ${CND_FILE} ${CND_FILE%%txt}hwe ${CND_FILE%%txt}adj ${CND_FILE%%txt}frqx ${CND_FILE%%txt}pv ${CND_GENES} ${CND_ANNOTS} ${COVS_COMMAND} ${SUFFIX}
 
 ## Done
 echo `date` "10 - Compile Stats and Annotations - DONE" >> ${UPDATE_FILE}
@@ -375,19 +378,22 @@ fi
  # Take in Genotypes for Candidate SNPs
  # Filter out Best SNPs (good hwe, higher MAF)
  # Spit out Model w/ relevant Coefficients
-if [ "$START_STEP" -le 10 ]; then
+if [ "$START_STEP" -le 12 ]; then
 echo \### 12 - `date` \###
-echo \### Filter Candidates & Build Model \###
+echo \### Filter Candidates and Build Model \###
 echo `date` "12 - Filter Candidates & Build Model" >> ${UPDATE_FILE}
 
+if [ $PHENO_TYPE = "C" ]
+then
+Rscript ${s12_Model_C_R} ${PHENO_SETS} ${NEW_COV_FILE} ${CND_FILE%%txt}compile.short ${CND_012}.raw ${COVS_COMMAND}
+else
+Rscript ${s12_Model_B_R} ${PHENO_SETS} ${NEW_COV_FILE} ${CND_FILE%%txt}compile.short ${CND_012}.raw ${COVS_COMMAND}
+fi
 
-Rscript 12-Model.R ${PHENO_SETS} ${NEW_COV_FILE} ${CND_FILE%%txt}.compile.short ${CND_012} ${COVS_COMMAND}
-
-
-
-
-
-
+## Done
+echo `date` "12 - Filter Candidates and Build Model - DONE" >> ${UPDATE_FILE}
+printf "V\nV\nV\nV\nV\nV\nV\nV\n"
+fi
 #####################################################################
 ## END OF DOC #######################################################
 #####################################################################

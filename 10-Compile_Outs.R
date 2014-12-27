@@ -7,13 +7,9 @@
 ## Usage: Rscript ${COMPILE_OUTS_R} ${CND_FILE} ${CND_FILE%%txt}hwe ${CND_FILE%%txt}adj ${CND_GENES}
 
 LINE <- commandArgs(trailingOnly = TRUE)
-# LINE <- paste("/projects/janssen/ASSOCIATION/20140623_LT8_DEL_MNe_MN_DAS_BL_MN_AGE_SEX_AGESEX_BMI_COUN_PC1_PC2/CND_LT8_DEL_MNe_MN_DAS_BL_MN_AGE_SEX_AGESEX_BMI_COUN_PC1_PC2.",c("txt","hwe","adj","Gene.txt","Annot.txt"),sep="")
-# LINE <- paste("/Users/kstandis/SDSC_PROJ/ASSOCIATION/20140625_LT8_DEL_MNe_MN_DAS_BL_MN_AGESEX_logBMI_COUN_PC1_PC2/CND_LT8_DEL_MNe_MN_DAS_BL_MN_AGESEX_logBMI_COUN_PC1_PC2.",c("txt","hwe","adj","Gene.txt","Annot.txt"),sep="")
-# LINE <- paste("/Users/kstandis/SDSC_PROJ/ASSOCIATION/20140625_LT8_DEL_28_BL_DAS_BL_AGESEX_logBMI_COUN_PC1_PC2/CND_LT8_DEL_28_BL_DAS_BL_AGESEX_logBMI_COUN_PC1_PC2.",c("txt","hwe","adj","Gene.txt","Annot.txt"),sep="")
-# LINE <- paste("/projects/janssen/ASSOCIATION/20140625_LT8_DEL_28_BL_DAS_BL_AGESEX_logBMI_COUN_PC1_PC2/CND_LT8_DEL_28_BL_DAS_BL_AGESEX_logBMI_COUN_PC1_PC2.",c("txt","hwe","adj","frqx","pv","Gene.txt","Annot.txt"),sep="")
-# LINE <- paste("/projects/janssen/ASSOCIATION/20140926_LT8_DEL_MNe_MN_DAS_BL_MN_AGESEX_logBMI_COUN_PC1_PC2/CND_LT8_DEL_MNe_MN_DAS_BL_MN_AGESEX_logBMI_COUN_PC1_PC2.",c("txt","hwe","adj","frqx","pv","Gene.txt","Annot.txt"),sep="")
-# LINE <- paste("/projects/janssen/ASSOCIATION/20140926b_LT8_DEL_MNe_MN_DAS_BL_MN_AGESEX_logBMI_COUN_PC1_PC2/CND_LT8_DEL_MNe_MN_DAS_BL_MN_AGESEX_logBMI_COUN_PC1_PC2.",c("txt","hwe","adj","frqx","pv","Gene.txt","Annot.txt"),sep="")
 # LINE <- paste("/projects/janssen/Poly_Train/20141124test_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2/CND_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2.",c("txt","hwe","adj","frqx","pv","Gene.txt","Annot.txt"),sep="")
+# LINE <- c( paste("/projects/janssen/Poly_Train/20141124test_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2/CND_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2.",c("txt","hwe","adj","frqx","pv","Gene.txt","Annot.txt"),sep=""), "DAS_BL_MN,PC1,PC2")
+# LINE <- c( paste("/projects/janssen/Poly_Train/20141124_ACR20_100wk_AGE_SEX_PC1_PC2/CND_ACR20_100wk_AGE_SEX_PC1_PC2.",c("txt","hwe","adj","frqx","pv","Gene.txt","Annot.txt"),sep=""), "AGE,SEX,PC1,PC2")
 PathToTxt <- LINE[1]
 PathToHW <- LINE[2]
 PathToADJ <- LINE[3]
@@ -21,16 +17,20 @@ PathToFRQ <- LINE[4]
 PathToPV <- LINE[5]
 PathToGene <- LINE[6]
 PathToAnnot <- LINE[7]
+Covs_Command <- LINE[8]
+Suffix <- LINE[9]
 Split <- strsplit(PathToTxt,"/")
 PathToAssoc <- paste(Split[[1]][1:(length(Split[[1]])-1)],collapse="/")
 PathToWrite <- gsub("txt","compiled",PathToTxt)
 
 ## Pull out Date, Pheno, Covariates
 Dir_Name <- strsplit(PathToAssoc,"/")[[1]][length(strsplit(PathToAssoc,"/")[[1]])]
-Date <- strsplit(Dir_Name,"_LT8_")[[1]][1]
-Pheno <- paste( strsplit( strsplit(Dir_Name,"_LT8_")[[1]][2], "_" )[[1]][1:3], collapse="_" )
-Covs <- paste( strsplit( strsplit(Dir_Name,"_LT8_")[[1]][2], "_" )[[1]][-(1:3)], collapse="_" )
-Covs <- gsub("_","+",Covs) ; Covs <- gsub("DAS+BL+MN","DAS_BL_MN",Covs,fixed=T)  ; Covs <- gsub("DAS+BL","DAS_BL",Covs,fixed=T)
+Date <- substr( Dir_Name, 1,8 )#strsplit(Dir_Name,"_LT8_")[[1]][1]
+Covs_File <- gsub( ",","_",Covs_Command) # paste( strsplit( strsplit(Dir_Name,"_LT8_")[[1]][2], "_" )[[1]][-(1:3)], collapse="_" )
+Covs <- gsub( ",","+",Covs_Command) 
+Pheno <- gsub( paste(Date,"_",sep=""), "", Dir_Name ) # paste( strsplit( strsplit(Dir_Name,"_LT8_")[[1]][2], "_" )[[1]][1:3], collapse="_" )
+Pheno <- gsub( paste("_",Covs_File,sep=""), "", Pheno )
+# Covs <- gsub("_","+",Covs) ; Covs <- gsub("DAS+BL+MN","DAS_BL_MN",Covs,fixed=T)  ; Covs <- gsub("DAS+BL","DAS_BL",Covs,fixed=T)
 
 #########################################################
 ## LOAD DATA ############################################
@@ -67,7 +67,9 @@ names(ADJ_2)[which(names(ADJ_2)=="QQ")] <- "P_Exp"
 FRQ_2 <- FRQ[,c("SNP","A1","A2","C.HOM.A1.","C.HET.","C.HOM.A2.")]
 
 ## PV Array
-PV_2 <- PV[,c("SNP","BETA","STAT","P")]
+if ( Suffix=="logistic" ) { Measure <- "OR"
+}else{ Measure <- "BETA" }
+PV_2 <- PV[,c("SNP",Measure,"STAT","P")]
 names(PV_2)[which(names(PV_2)=="P")] <- "P_Assoc_2"
 
 ## Gene Array
@@ -198,7 +200,7 @@ MG_WRITE <- MG_WRITE[c( which(MG_WRITE$CHR!=0),which(MG_WRITE$CHR==0),which(is.n
 COL_ORDER <- c("DATE","PHENO","COVS","CHR","BP","SVS_ID","SNP","VarType","CHR_POS","Chromosome","Begin","End",
 	"A1","A2","Reference","Allele","GENO","REF_GENO","HET","ALT_GENO","A1_FREQ","A2_FREQ","REF_ALL","ALT_ALL","C.HOM.A1.","C.HET.","C.HOM.A2.","P_HW",
 	"X1000genomes_AFR","X1000genomes_AMR","X1000genomes_ASN","X1000genomes_EUR","X1000GENOMES_AF","CG_WELLDERLY_AF",
-	"BETA","STAT","P_Assoc","P_Exp","FDR_BY","FDR_BH",
+	Measure,"STAT","P_Assoc","P_Exp","FDR_BY","FDR_BH",
 	"Gene","Gene_Type","Location","Coding_Impact","Functional_Impact","FUNC_PRED",
 	"Splice_Site_Pred","Protein_Impact_Prediction.Polyphen.","Protein_Impact_Prediction.SIFT.","Protein_Impact_Prediction.Condel.",
 	"Gene_Ontology","Disease_Ontology","omimGene_ID.omimGene_association","Protein_Domain_Gene_Ontology","dbSNP_ID" )
@@ -209,7 +211,7 @@ MG_WRITE_FULL <- MG_WRITE[,COL_ORDER] # t(MG_WRITE_FULL[875,])
 ## Remove redundant or superfluous columns from Table
 COL_ORDER_SHORT <- c("DATE","PHENO","COVS","CHR","BP","SVS_ID","SNP",
 	"Reference","Allele","A1","A2","GENO","REF_GENO","HET","ALT_GENO","REF_ALL","ALT_ALL","P_HW",
-	"BETA","STAT","P_Assoc","P_Exp","FDR_BY","FDR_BH",
+	Measure,"STAT","P_Assoc","P_Exp","FDR_BY","FDR_BH",
 	"X1000genomes_AFR","X1000genomes_AMR","X1000genomes_ASN","X1000genomes_EUR","X1000GENOMES_AF","CG_WELLDERLY_AF",
 	"Gene","Gene_Type","Location","Coding_Impact","FUNC_PRED","Functional_Impact",
 	"Splice_Site_Pred","Protein_Impact_Prediction.Polyphen.","Protein_Impact_Prediction.SIFT.","Protein_Impact_Prediction.Condel.",

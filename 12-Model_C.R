@@ -17,10 +17,13 @@
 ## PARSE COMMAND LINE #########################################
 ###############################################################
 
+library(gplots)
+
 ## Pull in Command Line Arguments
 LINE <- commandArgs(trailingOnly = TRUE)
 # LINE <- c( paste( "/projects/janssen/Poly_Train/20141124test_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2/", c("LT8_DEL_MNe_MN", "Cov_w_PCs.txt", "CND_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2.compile.short", "CND_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2_012.raw"), sep="" ), "DAS_BL_MN,PC1,PC2" )
 # LINE <- c( paste( "/Users/kstandis/Downloads/20141124_Poly_Train/", c("LT8_DEL_MNe_MN", "Cov_w_PCs.txt", "CND_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2.compile.short", "CND_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2_012.raw"), sep="" ), "DAS_BL_MN,PC1,PC2" )
+# LINE <- c( paste( "/projects/janssen/Poly_Train/20141222_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2/", c("LT8_DEL_MNe_MN", "Cov_w_PCs.txt", "CND_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2.compile.short", "CND_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2_012.raw"), sep="" ), "DAS_BL_MN,PC1,PC2" )
 
 ## Parse Command Line Arguments
 PathToPheno <- LINE[1]
@@ -28,6 +31,11 @@ PathToCovs <- LINE[2]
 PathToComp <- LINE[3]
 PathToGeno <- LINE[4]
 Covs_Command <- LINE[5]
+
+## Set Path to Save
+Split_1 <- strsplit(PathToGeno,"/")[[1]]
+PathToSave <- paste( c(Split_1[1:(length(Split_1)-1)],""), collapse="/" )
+File_Name <- gsub( "CND_","", gsub( "_012.raw","", Split_1[length(Split_1)] ) )
 
 ###############################################################
 ## LOAD DATA ##################################################
@@ -113,7 +121,7 @@ in_loop <- 0
 for ( v in 1:length(P.gt.a) ) {
 	var <- names(P.gt.a)[v]
 	row <- which( rownames(GT.corr.a)==var )
-	if ( !(var %in% RM.corr) ) {
+	if ( !(var %in% RM.corr) & row<ncol(GT.corr.a) ) {
 		in_loop <- in_loop + 1
 		print(paste("######",in_loop,":",v,"-",var,"######" ))
 		print( range( (row+1):ncol(GT.corr.a) ) )
@@ -135,7 +143,7 @@ in_loop <- 0
 for ( v in 1:length(P.gt.a) ) {
 	var <- names(P.gt.a)[v]
 	row <- which( rownames(GT.corr.a)==var )
-	if ( !(var %in% RM.corr) ) {
+	if ( !(var %in% RM.corr) & row<ncol(GT.corr.a) ) {
 		in_loop <- in_loop + 1
 		print(paste("######",in_loop,":",v,"-",var,"######" ))
 		print( range( (row+1):ncol(GT.corr.a) ) )
@@ -150,10 +158,12 @@ P.gt.1 <- P.gt.a[ -which( names(P.gt.a) %in% RM.corr ) ] #; names(P.gt) <- KP.P.
 GT.cand.1 <- GT.cand.a[ ,-which( colnames(GT.cand.a) %in% RM.corr ) ]
 GT.corr.1 <- cor( GT.cand.1 )
 ## Compare
+jpeg( paste(PathToSave,"MOD_SNP_Corr",File_Name,".jpeg",sep=""), height=1000, width=2500, pointsize=30 )
 par(mfrow=c(1,3))
-hist( GT.corr.a, breaks=seq(-1,1,.01),col="blue" ) ; abline( v=seq(-1,1,.2),lty=2,col="red" )
-hist( GT.corr.9, breaks=seq(-1,1,.01),col="blue" ) ; abline( v=seq(-1,1,.2),lty=2,col="red" )
-hist( GT.corr.1, breaks=seq(-1,1,.01),col="blue" ) ; abline( v=seq(-1,1,.2),lty=2,col="red" )
+hist( GT.corr.a, breaks=seq(-1,1,.01),col="dodgerblue2", main="Variant Correlation: All", xlab="R" ) ; abline( v=seq(-1,1,.2),lty=2,col="firebrick3" )
+hist( GT.corr.9, breaks=seq(-1,1,.01),col="dodgerblue2", main="Variant Correlation: R2 < .9", xlab="R" ) ; abline( v=seq(-1,1,.2),lty=2,col="firebrick3" )
+hist( GT.corr.1, breaks=seq(-1,1,.01),col="dodgerblue2", main="Variant Correlation: R2 < .1", xlab="R" ) ; abline( v=seq(-1,1,.2),lty=2,col="firebrick3" )
+dev.off()
 
 ###############################################################
 ## MERGE FILES ################################################
@@ -174,15 +184,15 @@ MG.TR.9 <- MG.TR.2.9[,3:ncol(MG.TR.2.9)] ; rownames(MG.TR.9) <- as.character( MG
 MG.TS.9 <- MG.TS.2.9[,3:ncol(MG.TS.2.9)] ; rownames(MG.TS.9) <- as.character( MG.TS.2.9[,1] )
 TEMP.TR.9 <- cor( MG.TR.9[87:ncol(MG.TR.9)] )
 TEMP.TS.9 <- cor( MG.TS.9[87:ncol(MG.TS.9)] )
-heatmap.2( TEMP.TR.9, scale="none", trace="none")
+# heatmap.2( TEMP.TR.9, scale="none", trace="none")
 MG.TR.1 <- MG.TR.2.1[,3:ncol(MG.TR.2.1)] ; rownames(MG.TR.1) <- as.character( MG.TR.2.1[,1] )
 MG.TS.1 <- MG.TS.2.1[,3:ncol(MG.TS.2.1)] ; rownames(MG.TS.1) <- as.character( MG.TS.2.1[,1] )
 TEMP.TR.1 <- cor( MG.TR.1[87:ncol(MG.TR.1)] )
 TEMP.TS.1 <- cor( MG.TS.1[87:ncol(MG.TS.1)] )
-heatmap.2( TEMP.TR.1, scale="none", trace="none")
+# heatmap.2( TEMP.TR.1, scale="none", trace="none")
 
 ###############################################################
-## MODEL w/ REGRESSION FIT of UNCORRELATED GENOTYPES ##########
+## MODEL w/ REGRESSION FIT of CORRELATED GENOTYPES ############
 ###############################################################
 ## Using <.9 correlated genotypes:
  # throw each predictor into a multiple regression (including best GT each time)
@@ -209,7 +219,7 @@ TO_TEST.gt <- length(TO_TEST.cov) + 1:length(BETA.gt.9)
 TO_TEST <- TO_TEST.cov
 TO_INCL <- c()
 TO_OMIT <- c()
-MOD_SIZE <- 150 # nrow(COEF.all) # 20
+MOD_SIZE <- 60 ; MOD_SIZE <- min( MOD_SIZE, nrow(COEF.all) )
 N_PREDS <- nrow(COEF.all)
 R2.test <- list()
 R2.test$TS <- R2.test$TR <- R2.test$TS.adj <- R2.test$TR.adj <- array( , c(N_PREDS,MOD_SIZE) )
@@ -228,12 +238,10 @@ for ( i in 1:MOD_SIZE ) {
 		## Build Temporary Data Frame with These Covariates
 		TEMP.TR.9 <- data.matrix( MG.TR.9[, Which_Pred ] )
 		TEMP.TS.9 <- data.matrix( MG.TS.9[, Which_Pred ] )
-		## Predict Values from Test Set based on Model with these Predictors
-		# PRED.TS.9 <- COEF.int$BETA.all + TEMP.TS.9 %*% COEF.all[Which_Pred,"BETA.all"]
-		# PRED.TR.9 <- COEF.int$BETA.all + TEMP.TR.9 %*% COEF.all[Which_Pred,"BETA.all"]
 		## Fit Model Using lm()
 		MOD.TR.9 <- lm( MG.TR.9[,"Pheno"] ~ TEMP.TR.9 )
 		COEF.mod <- coef(MOD.TR.9)
+		## Predict Values from Test Set based on Model with these Predictors
 		PRED.TR.9 <- COEF.mod[1] + TEMP.TR.9 %*% matrix(COEF.mod[-1])
 		PRED.TS.9 <- COEF.mod[1] + TEMP.TS.9 %*% matrix(COEF.mod[-1])
 		## Calculate R2 for covariate model
@@ -288,6 +296,7 @@ XLIM <- c(1,nrow(R2.9))
 YLIM <- c(-1,1) # range(R2.9)
 COLS <- c( rep(c("chartreuse2","dodgerblue2"),2) ) # , rep("dodgerblue2",2) )
 LTYS <- c( 1,1,2,2 )
+jpeg( paste(PathToSave,"MOD_Reg_",File_Name,".jpeg",sep=""), height=1000, width=2000, pointsize=30 )
 plot( 0,0, type="n", xlim=XLIM, ylim=YLIM, xaxt="n", xlab="Predictors Included (Cummulative)", ylab="R2.9 & Adj R2.9", main="Variance Explained by Model" )
 axis( 1, at=1:nrow(R2.9), label=TO_INCL, las=2 )
 abline( h=seq( -1,1,.1), lty=c(rep(2,10),1,rep(2,10)), col=c(rep("firebrick3",10),"black",rep("grey50",10)) ) 
@@ -296,6 +305,7 @@ for ( i in 1:4 ) {
 	points( 1:nrow(R2.9), R2.9[,i], col=COLS[i], lty=LTYS[i], type="l", lwd=3 )
 }
 legend( quantile(XLIM,.8), quantile(YLIM,.9), legend=colnames(R2.9), lty=LTYS, col=COLS, lwd=3 )
+dev.off()
 
 # ## Heatmaps of Predictors
 # COLS <- c( "gold1","chocolate2","firebrick3","black","slateblue3","steelblue2","springgreen1" )
@@ -340,7 +350,8 @@ TO_TEST.gt <- length(TO_TEST.cov) + 1:length(BETA.gt.1)
 TO_TEST <- TO_TEST.cov
 TO_INCL <- TO_OMIT <- c()
 GT_Flag <- 0
-MOD_SIZE <- nrow(COEF.all) # 20
+MOD_SIZE <- 30 ; MOD_SIZE <- min( MOD_SIZE, nrow(COEF.all) ) # 20
+# MOD_SIZE <- nrow(COEF.all) # 20
 N_PREDS <- nrow(COEF.all)
 R2.test <- list()
 R2.test$TS <- R2.test$TR <- R2.test$TS.adj <- R2.test$TR.adj <- array( , c(N_PREDS,MOD_SIZE) )
@@ -353,12 +364,12 @@ colnames(R2) <- c("TR","TS","Adj.TR","Adj.TS")
 start_time <- proc.time()
 for ( i in 1:MOD_SIZE ) {
 # for ( i in 1:10 ) {
-	## Switch to Genotypes
+	## After Covariates, Switch to Genotypes
 	if ( i == length(TO_TEST.cov)+1 ) {
 		TO_TEST <- TO_TEST.gt[1:(N_PREDS-length(TO_TEST.cov))]
 		GT_Flag <- 1
 	}
-	## Loop through all Predictors and Find Best on to ADD to model
+	## Loop through all Predictors and Find Best one to ADD to model
 	for ( r in TO_TEST ) {
 		This_Pred <- rownames(COEF.all)[r]
 		Which_Pred <- c( TO_INCL, This_Pred )
@@ -437,6 +448,7 @@ XLIM <- c(1,nrow(R2.1))
 YLIM <- c(-1,1) # range(R2.1)
 COLS <- c( rep(c("chartreuse2","dodgerblue2"),2) ) # , rep("dodgerblue2",2) )
 LTYS <- c( 1,1,2,2 )
+jpeg( paste(PathToSave,"MOD_Scr_",File_Name,".jpeg",sep=""), height=1000, width=2000, pointsize=30 )
 plot( 0,0, type="n", xlim=XLIM, ylim=YLIM, xaxt="n", xlab="Predictors Included (Cummulative)", ylab="R2.1 & Adj R2.1", main="Variance Explained by Model" )
 axis( 1, at=1:nrow(R2.1), label=TO_INCL, las=2 )
 abline( h=seq( -1,1,.1), lty=c(rep(2,10),1,rep(2,10)), col=c(rep("firebrick3",10),"black",rep("grey50",10)) ) 
@@ -444,111 +456,25 @@ abline( v=seq( 0,nrow(R2.1),5), lty=2, col="grey50" )
 for ( i in 1:4 ) {
 	points( 1:nrow(R2.1), R2.1[,i], col=COLS[i], lty=LTYS[i], type="l", lwd=3 )
 }
-legend( quantile(XLIM,.8), quantile(YLIM,.1), legend=colnames(R2.1), lty=LTYS, col=COLS, lwd=3 )
-
-
-###############################################################
-## END OF DOC #################################################
-###############################################################
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Predict values of phenotype for Test Group
- # With all Covariates
-TAB.TS.all.cov <- data.matrix( MG.TS[, Cov_Cols ] ) 
-PRED.TS.all <- BETA.cov["(Intercept)"] + TAB.TS.all.cov %*% BETA.cov[2:length(BETA.cov)]
-
-## Calculate R2 for covariate model
- # Calc Sum Squares
-DIFF.TS.all <- PRED.TS.all - MG.TS$Pheno
-SS.TS.all <- sum(DIFF.TS.all^2) - sum(DIFF.TS.all)^2 / length(DIFF.TS.all)
-SS.TS.val <- sum(MG.TS$Pheno^2) - sum(MG.TS$Pheno)^2 / nrow(MG.TS)
- # R2
-R2.all <- 1 - SS.TS.all / SS.TS.val
-R2.sig <- 1 - SS.TS.sig / SS.TS.val
- # Adjusted R2
-R2.adj.all <- 1 - ( SS.TS.all/(nrow(MG.TS)-length(BETA.cov)) / (SS.TS.val/(nrow(MG.TS)-1)) )
-R2.adj.sig <- 1 - ( SS.TS.sig/(nrow(MG.TS)-length(BETA.cov)) / (SS.TS.val/(nrow(MG.TS)-1)) )
-
-
+legend( quantile(XLIM,.01), quantile(YLIM,.9), legend=colnames(R2.1), lty=LTYS, col=COLS, lwd=3 )
+dev.off()
 
 ###############################################################
-## MODEL w/ COVARIATES ########################################
+## SAVE DATA ##################################################
 ###############################################################
 
-## Retreive Coefficients for Covariates Included in Model
-TAB.TR.cov <- MG.TR[, c("Pheno",Cov_Cols) ]# gsub( ",","+",Covs_Command )
-MOD.cov <- lm( Pheno ~ . , data=TAB.TR.cov )
-BETA.cov <- coef( MOD.cov )
+## Compile all the data I want to save
+COMPILE <- list( R2.9, R2.9.test, R2.1, R2.1.test )
+names(COMPILE) <- c("R2_9","R2_9_test","R2_1","R2_1_test")
 
-## Predict values of phenotype for Test Group
- # With all Covariates
-TAB.TS.all.cov <- data.matrix( MG.TS[, Cov_Cols ] ) 
-PRED.TS.all <- BETA.cov["(Intercept)"] + TAB.TS.all.cov %*% BETA.cov[2:length(BETA.cov)]
- # With only Significant Covariates
-SIG.cov <- rownames(anova(MOD.cov))[ which( anova(MOD.cov)[,"Pr(>F)"]<.05 ) ]
-TAB.TS.sig.cov <- data.matrix( MG.TS[, SIG.cov ] ) 
-PRED.TS.sig <- BETA.cov["(Intercept)"] + TAB.TS.sig.cov %*% BETA.cov[SIG.cov]
-cor( data.frame(PRED.TS.all, PRED.TS.sig, MG.TS$Pheno) )
-pairs( data.frame(PRED.TS.all, PRED.TS.sig, MG.TS$Pheno) )
-pairs( data.frame(PRED.TS.all, PRED.TS.sig, MG.TS$Pheno) )
+## Save all the data
+save( COMPILE, file=paste(PathToSave,"MOD_",File_Name,sep="") )
 
-## Calculate R2 for covariate model
- # Calc Sum Squares
-DIFF.TS.all <- PRED.TS.all - MG.TS$Pheno
-DIFF.TS.sig <- PRED.TS.sig - MG.TS$Pheno
-SS.TS.all <- sum(DIFF.TS.all^2) - sum(DIFF.TS.all)^2 / length(DIFF.TS.all)
-SS.TS.sig <- sum(DIFF.TS.sig^2) - sum(DIFF.TS.sig)^2 / length(DIFF.TS.sig)
-SS.TS.val <- sum(MG.TS$Pheno^2) - sum(MG.TS$Pheno)^2 / nrow(MG.TS)
- # R2
-R2.all <- 1 - SS.TS.all / SS.TS.val
-R2.sig <- 1 - SS.TS.sig / SS.TS.val
- # Adjusted R2
-R2.adj.all <- 1 - ( SS.TS.all/(nrow(MG.TS)-length(BETA.cov)) / (SS.TS.val/(nrow(MG.TS)-1)) )
-R2.adj.sig <- 1 - ( SS.TS.sig/(nrow(MG.TS)-length(BETA.cov)) / (SS.TS.val/(nrow(MG.TS)-1)) )
 
-##
 
-## Try a bunch of different models and go with the one w/ the best Adjusted R2
- # This will get out of hand if I use all variants/covariates
- # 
+
+
+
 
 ###############################################################
 ## END OF DOC #################################################
