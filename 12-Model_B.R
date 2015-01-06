@@ -23,6 +23,7 @@ library(gplots)
 LINE <- commandArgs(trailingOnly = TRUE)
 # LINE <- c( paste( "/Users/kstandis/Downloads/20141124_Poly_Train/ACR20/", c("ACR20_100wk", "Cov_w_PCs.txt", "CND_ACR20_100wk_AGE_SEX_PC1_PC2.compile.short", "CND_ACR20_100wk_AGE_SEX_PC1_PC2_012.raw"), sep="" ), "AGE,SEX,PC1,PC2" )
 # LINE <- c( paste( "/projects/janssen/Poly_Train/20150105_1_ACR50_100wk_AGE_SEX/", c("ACR50_100wk", "Cov_w_PCs.txt", "CND_ACR50_100wk_AGE_SEX.compile.short", "CND_ACR50_100wk_AGE_SEX_012.raw"), sep="" ), "AGE,SEX" )
+# LINE <- c( paste( "/projects/janssen/Poly_Train/20150105_2_ACR50_100wk_AGE_SEX/", c("ACR50_100wk", "Cov_w_PCs.txt", "CND_ACR50_100wk_AGE_SEX.compile.short", "CND_ACR50_100wk_AGE_SEX_012.raw"), sep="" ), "AGE,SEX" )
 
 ## Parse Command Line Arguments
 PathToPheno <- LINE[1]
@@ -69,17 +70,17 @@ GT <- read.table( PathToGeno, header=T )
 
 ## Remove Duplicate SNPs
 RM.DUP <- which(duplicated( CP$SNP ))
-CP.1 <- CP[ -RM.DUP, ]
+if (length(RM.DUP)>0) { CP.1 <- CP[ -RM.DUP, ] }else{ CP.1 <- CP }
 
 ## Remove HW Violations
 THRSH.HWE <- 1e-8
 RM.HWE <- which( CP.1$P_HW < THRSH.HWE )
-CP.2 <- CP.1[ -RM.HWE, ]
+if (length(RM.HWE)>0) { CP.2 <- CP.1[ -RM.HWE, ] }else{ CP.2 <- CP.1 }
 
 ## Pull out Variants w/ MAF > p%
 THRSH.MAF <- 0.05
 RM.MAF <- which( CP.2$REF_ALL < THRSH.MAF | CP.2$ALT_ALL < THRSH.MAF )
-CP.3 <- CP.2[ -RM.MAF, ]
+if (length(RM.MAF)>0) { CP.3 <- CP.2[ -RM.MAF, ] }else{ CP.3 <- CP.2 }
 
 ## Pull out Best Remaining P-Values (from Compiled Data)
 BEST.COUNT <- nrow(CP.3) # 500

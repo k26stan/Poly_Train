@@ -71,17 +71,17 @@ GT <- read.table( PathToGeno, header=T )
 
 ## Remove Duplicate SNPs
 RM.DUP <- which(duplicated( CP$SNP ))
-CP.1 <- CP[ -RM.DUP, ]
+if (length(RM.DUP)>0) { CP.1 <- CP[ -RM.DUP, ] }else{ CP.1 <- CP }
 
 ## Remove HW Violations
 THRSH.HWE <- 1e-8
 RM.HWE <- which( CP.1$P_HW < THRSH.HWE )
-CP.2 <- CP.1[ -RM.HWE, ]
+if (length(RM.HWE)>0) { CP.2 <- CP.1[ -RM.HWE, ] }else{ CP.2 <- CP.1 }
 
 ## Pull out Variants w/ MAF > 10%
 THRSH.MAF <- 0.05
 RM.MAF <- which( CP.2$REF_ALL < THRSH.MAF | CP.2$ALT_ALL < THRSH.MAF )
-CP.3 <- CP.2[ -RM.MAF, ]
+if (length(RM.MAF)>0) { CP.3 <- CP.2[ -RM.MAF, ] }else{ CP.3 <- CP.2 }
 
 ## Pull out Best Remaining P-Values (from Compiled Data)
 BEST.COUNT <- nrow(CP.3) # 500
