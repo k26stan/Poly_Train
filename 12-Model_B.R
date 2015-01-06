@@ -22,6 +22,7 @@ library(gplots)
 ## Pull in Command Line Arguments
 LINE <- commandArgs(trailingOnly = TRUE)
 # LINE <- c( paste( "/Users/kstandis/Downloads/20141124_Poly_Train/ACR20/", c("ACR20_100wk", "Cov_w_PCs.txt", "CND_ACR20_100wk_AGE_SEX_PC1_PC2.compile.short", "CND_ACR20_100wk_AGE_SEX_PC1_PC2_012.raw"), sep="" ), "AGE,SEX,PC1,PC2" )
+# LINE <- c( paste( "/projects/janssen/Poly_Train/20150105_1_ACR50_100wk_AGE_SEX/", c("ACR50_100wk", "Cov_w_PCs.txt", "CND_ACR50_100wk_AGE_SEX.compile.short", "CND_ACR50_100wk_AGE_SEX_012.raw"), sep="" ), "AGE,SEX" )
 
 ## Parse Command Line Arguments
 PathToPheno <- LINE[1]
@@ -468,7 +469,7 @@ COMPILE <- list( AUC.9, AUC.9.test ) #, AUC.1, AUC.1.test )
 names(COMPILE) <- c("AUC_9","AUC_9_test") # ,"AUC_1","AUC_1_test")
 
 ## Save all the data
-save( COMPILE, file=paste(PathToSave,"MOD_",File_Name,sep="") )
+save( COMPILE, file=paste(PathToSave,"MOD_",File_Name,".Rdata",sep="") )
 
 
 

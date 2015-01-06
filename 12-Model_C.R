@@ -24,6 +24,7 @@ LINE <- commandArgs(trailingOnly = TRUE)
 # LINE <- c( paste( "/projects/janssen/Poly_Train/20141124test_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2/", c("LT8_DEL_MNe_MN", "Cov_w_PCs.txt", "CND_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2.compile.short", "CND_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2_012.raw"), sep="" ), "DAS_BL_MN,PC1,PC2" )
 # LINE <- c( paste( "/Users/kstandis/Downloads/20141124_Poly_Train/", c("LT8_DEL_MNe_MN", "Cov_w_PCs.txt", "CND_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2.compile.short", "CND_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2_012.raw"), sep="" ), "DAS_BL_MN,PC1,PC2" )
 # LINE <- c( paste( "/projects/janssen/Poly_Train/20141222_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2/", c("LT8_DEL_MNe_MN", "Cov_w_PCs.txt", "CND_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2.compile.short", "CND_LT8_DEL_MNe_MN_DAS_BL_MN_PC1_PC2_012.raw"), sep="" ), "DAS_BL_MN,PC1,PC2" )
+# LINE <- c( paste( "/projects/janssen/Poly_Train/20150105_1_LT8_DEL_MNe_MN_DAS_BL_MN/", c("LT8_DEL_MNe_MN", "Cov_w_PCs.txt", "CND_LT8_DEL_MNe_MN_DAS_BL_MN.compile.short", "CND_LT8_DEL_MNe_MN_DAS_BL_MN_012.raw"), sep="" ), "DAS_BL_MN" )
 
 ## Parse Command Line Arguments
 PathToPheno <- LINE[1]
@@ -468,7 +469,7 @@ COMPILE <- list( R2.9, R2.9.test, R2.1, R2.1.test )
 names(COMPILE) <- c("R2_9","R2_9_test","R2_1","R2_1_test")
 
 ## Save all the data
-save( COMPILE, file=paste(PathToSave,"MOD_",File_Name,sep="") )
+save( COMPILE, file=paste(PathToSave,"MOD_",File_Name,".Rdata",sep="") )
 
 
 
