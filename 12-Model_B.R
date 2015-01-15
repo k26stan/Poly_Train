@@ -466,8 +466,8 @@ dev.off()
 ###############################################################
 
 ## Compile all the data I want to save
-COMPILE <- list( AUC.9, AUC.9.test ) #, AUC.1, AUC.1.test )
-names(COMPILE) <- c("AUC_9","AUC_9_test") # ,"AUC_1","AUC_1_test")
+COMPILE <- list( AUC.9, AUC.9.test, AUC.1, AUC.1.test )
+names(COMPILE) <- c("AUC_9","AUC_9_test" ,"AUC_1","AUC_1_test")
 
 ## Save all the data
 save( COMPILE, file=paste(PathToSave,"MOD_",File_Name,".Rdata",sep="") )
