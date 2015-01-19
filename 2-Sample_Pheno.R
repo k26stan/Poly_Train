@@ -34,7 +34,8 @@ PH <- read.table(PathToPheno,header=T)
 ###############################################################
 
 ## Sample Test/Training Sets
-TRAIN <- sample( 1:nrow(PH), .7*nrow(PH), replace=F )
+TRAIN_PRC <- 0.8
+TRAIN <- sample( 1:nrow(PH), TRAIN_PRC*nrow(PH), replace=F )
 PH.TRAIN <- PH[ TRAIN, ]
 PH.TEST <- PH[ -TRAIN, ]
 
