@@ -24,6 +24,7 @@ LINE <- commandArgs(trailingOnly = TRUE)
 # LINE <- c( paste( "/Users/kstandis/Downloads/20141124_Poly_Train/ACR20/", c("ACR20_100wk", "Cov_w_PCs.txt", "CND_ACR20_100wk_AGE_SEX_PC1_PC2.compile.short", "CND_ACR20_100wk_AGE_SEX_PC1_PC2_012.raw"), sep="" ), "AGE,SEX,PC1,PC2" )
 # LINE <- c( paste( "/projects/janssen/Poly_Train/20150105_1_ACR50_100wk_AGE_SEX/", c("ACR50_100wk", "Cov_w_PCs.txt", "CND_ACR50_100wk_AGE_SEX.compile.short", "CND_ACR50_100wk_AGE_SEX_012.raw"), sep="" ), "AGE,SEX" )
 # LINE <- c( paste( "/projects/janssen/Poly_Train/20150105_2_ACR50_100wk_AGE_SEX/", c("ACR50_100wk", "Cov_w_PCs.txt", "CND_ACR50_100wk_AGE_SEX.compile.short", "CND_ACR50_100wk_AGE_SEX_012.raw"), sep="" ), "AGE,SEX" )
+# LINE <- c( paste( "/projects/janssen/Poly_Train/20150119_2_ACR50_100wk_AGE_SEX/", c("ACR50_100wk", "Cov_w_PCs.txt", "CND_ACR50_100wk_AGE_SEX.compile.short", "CND_ACR50_100wk_AGE_SEX_012.raw"), sep="" ), "AGE,SEX" )
 
 ## Parse Command Line Arguments
 PathToPheno <- LINE[1]
@@ -164,6 +165,7 @@ hist( GT.corr.a, breaks=seq(-1,1,.01),col="dodgerblue2", main="Variant Correlati
 hist( GT.corr.9, breaks=seq(-1,1,.01),col="dodgerblue2", main="Variant Correlation: R2 < .9", xlab="R" ) ; abline( v=seq(-1,1,.2),lty=2,col="firebrick3" )
 hist( GT.corr.1, breaks=seq(-1,1,.01),col="dodgerblue2", main="Variant Correlation: R2 < .1", xlab="R" ) ; abline( v=seq(-1,1,.2),lty=2,col="firebrick3" )
 dev.off()
+print("## Filtering Done ##")
 
 ###############################################################
 ## MERGE FILES ################################################
@@ -182,14 +184,15 @@ MG.TS.2.1 <- merge( x=MG.TS.1, y=GT.cand.1, by.x="FID", by.y="row.names" )
 ## And get rid of IID & FID in table
 MG.TR.9 <- MG.TR.2.9[,3:ncol(MG.TR.2.9)] ; rownames(MG.TR.9) <- as.character( MG.TR.2.9[,1] )
 MG.TS.9 <- MG.TS.2.9[,3:ncol(MG.TS.2.9)] ; rownames(MG.TS.9) <- as.character( MG.TS.2.9[,1] )
-TEMP.TR.9 <- cor( MG.TR.9[87:ncol(MG.TR.9)] )
-TEMP.TS.9 <- cor( MG.TS.9[87:ncol(MG.TS.9)] )
+TEMP.TR.9 <- cor( MG.TR.9[ colnames(GT.cand.9) ] )
+TEMP.TS.9 <- cor( MG.TS.9[ colnames(GT.cand.9) ] )
 # heatmap.2( TEMP.TR.9, scale="none", trace="none")
 MG.TR.1 <- MG.TR.2.1[,3:ncol(MG.TR.2.1)] ; rownames(MG.TR.1) <- as.character( MG.TR.2.1[,1] )
 MG.TS.1 <- MG.TS.2.1[,3:ncol(MG.TS.2.1)] ; rownames(MG.TS.1) <- as.character( MG.TS.2.1[,1] )
-TEMP.TR.1 <- cor( MG.TR.1[87:ncol(MG.TR.1)] )
-TEMP.TS.1 <- cor( MG.TS.1[87:ncol(MG.TS.1)] )
+TEMP.TR.1 <- cor( MG.TR.1[ colnames(GT.cand.1) ] )
+TEMP.TS.1 <- cor( MG.TS.1[ colnames(GT.cand.1) ] )
 # heatmap.2( TEMP.TR.1, scale="none", trace="none")
+print("## Merging Done ##")
 
 ###############################################################
 ## MODEL w/ REGRESSION FIT of CORRELATED GENOTYPES ############
@@ -228,6 +231,7 @@ rownames(AUC.test$TS) <- rownames(AUC.test$TR) <- rownames(COEF.all)[1:N_PREDS]
 AUC <- array( , dim=c(MOD_SIZE,2) )
 colnames(AUC) <- c("TR","TS")
 # for ( r in 1:nrow(COEF.all) ) {
+print("## Building Models ##")
 start_time <- proc.time()
 for ( i in 1:MOD_SIZE ) {
 	## Switch to Genotypes

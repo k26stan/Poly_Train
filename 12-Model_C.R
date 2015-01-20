@@ -165,6 +165,7 @@ hist( GT.corr.a, breaks=seq(-1,1,.01),col="dodgerblue2", main="Variant Correlati
 hist( GT.corr.9, breaks=seq(-1,1,.01),col="dodgerblue2", main="Variant Correlation: R2 < .9", xlab="R" ) ; abline( v=seq(-1,1,.2),lty=2,col="firebrick3" )
 hist( GT.corr.1, breaks=seq(-1,1,.01),col="dodgerblue2", main="Variant Correlation: R2 < .1", xlab="R" ) ; abline( v=seq(-1,1,.2),lty=2,col="firebrick3" )
 dev.off()
+print("## Filtering Done ##")
 
 ###############################################################
 ## MERGE FILES ################################################
@@ -183,14 +184,15 @@ MG.TS.2.1 <- merge( x=MG.TS.1, y=GT.cand.1, by.x="FID", by.y="row.names" )
 ## And get rid of IID & FID in table
 MG.TR.9 <- MG.TR.2.9[,3:ncol(MG.TR.2.9)] ; rownames(MG.TR.9) <- as.character( MG.TR.2.9[,1] )
 MG.TS.9 <- MG.TS.2.9[,3:ncol(MG.TS.2.9)] ; rownames(MG.TS.9) <- as.character( MG.TS.2.9[,1] )
-TEMP.TR.9 <- cor( MG.TR.9[87:ncol(MG.TR.9)] )
-TEMP.TS.9 <- cor( MG.TS.9[87:ncol(MG.TS.9)] )
+TEMP.TR.9 <- cor( MG.TR.9[ colnames(GT.cand.9) ] )
+TEMP.TS.9 <- cor( MG.TS.9[ colnames(GT.cand.9) ] )
 # heatmap.2( TEMP.TR.9, scale="none", trace="none")
 MG.TR.1 <- MG.TR.2.1[,3:ncol(MG.TR.2.1)] ; rownames(MG.TR.1) <- as.character( MG.TR.2.1[,1] )
 MG.TS.1 <- MG.TS.2.1[,3:ncol(MG.TS.2.1)] ; rownames(MG.TS.1) <- as.character( MG.TS.2.1[,1] )
-TEMP.TR.1 <- cor( MG.TR.1[87:ncol(MG.TR.1)] )
-TEMP.TS.1 <- cor( MG.TS.1[87:ncol(MG.TS.1)] )
+TEMP.TR.1 <- cor( MG.TR.1[ colnames(GT.cand.1) ] )
+TEMP.TS.1 <- cor( MG.TS.1[ colnames(GT.cand.1) ] )
 # heatmap.2( TEMP.TR.1, scale="none", trace="none")
+print("## Merging Done ##")
 
 ###############################################################
 ## MODEL w/ REGRESSION FIT of CORRELATED GENOTYPES ############
@@ -228,6 +230,7 @@ rownames(R2.test$TS) <- rownames(R2.test$TR) <- rownames(R2.test$TS.adj) <- rown
 R2 <- array( , dim=c(MOD_SIZE,4) )
 colnames(R2) <- c("TR","TS","Adj.TR","Adj.TS")
 # for ( r in 1:nrow(COEF.all) ) {
+print("## Building Models ##")
 start_time <- proc.time()
 for ( i in 1:MOD_SIZE ) {
 	## Switch to Genotypes
