@@ -7,39 +7,88 @@
 ## TRANSFER DATA ONTO MAC ###############################################
 #########################################################################
 
-## On Mac Terminal
-# for num in `seq 1 10`
-# do
-# SCP_IN /projects/janssen/Deliver_3/Polygenic_Modeling/20150105_${num}_ACR50_100wk_AGE_SEX/MOD_ACR50_100wk_AGE_SEX.Rdata /Users/kstandis/Data/Burn/Poly_Train/20150112_Meta/Data/20150105_${num}_MOD_ACR50_100wk_AGE_SEX.Rdata
-# SCP_IN /projects/janssen/Deliver_3/Polygenic_Modeling/20150105_${num}_LT8_DEL_MNe_MN_DAS_BL_MN/MOD_LT8_DEL_MNe_MN_DAS_BL_MN.Rdata /Users/kstandis/Data/Burn/Poly_Train/20150112_Meta/Data/20150105_${num}_MOD_LT8_DEL_MNe_MN_DAS_BL_MN.Rdata
-# done
+## Specify inputs/names/etc...
+DATE=20150119
+N=20
+# PHENO_NAME=ACR50_100wk_AGE_SEX
+PHENO_NAME=LT8_DEL_MNe_MN_DAS_BL_MN
+
+mkdir /Users/kstandis/Data/Burn/Poly_Train/${DATE}_Meta/
+mkdir /Users/kstandis/Data/Burn/Poly_Train/${DATE}_Meta/Data/
+mkdir /Users/kstandis/Data/Burn/Poly_Train/${DATE}_Meta/Plots/
+# On Mac Terminal
+for num in `seq 1 ${N}`
+do
+	# Change TAG Identifier
+	TAG=${DATE}_${num}
+	# Set Path To Mac Directory
+	MAC_PATH=/Users/kstandis/Data/Burn/Poly_Train/${DATE}_Meta/Data/${TAG}_MOD_${PHENO_NAME}.Rdata
+	# Import Data
+	SCP_IN /projects/janssen/Poly_Train/${TAG}_${PHENO_NAME}/*Rdata ${MAC_PATH}
+	# SCP_IN /projects/janssen/Deliver_3/Polygenic_Modeling/20150105_${num}_ACR50_100wk_AGE_SEX/MOD_ACR50_100wk_AGE_SEX.Rdata /Users/kstandis/Data/Burn/Poly_Train/20150112_Meta/Data/20150105_${num}_MOD_ACR50_100wk_AGE_SEX.Rdata
+	# SCP_IN /projects/janssen/Deliver_3/Polygenic_Modeling/20150105_${num}_LT8_DEL_MNe_MN_DAS_BL_MN/MOD_LT8_DEL_MNe_MN_DAS_BL_MN.Rdata /Users/kstandis/Data/Burn/Poly_Train/20150112_Meta/Data/20150105_${num}_MOD_LT8_DEL_MNe_MN_DAS_BL_MN.Rdata
+done
+
+## Create Directory for Results
+mkdir Dropbox/Schork/JNJ11/Association/Poly_Train/${DATE}_${PHENO_NAME}/
+## Loop through N times
+for num in `seq 1 ${N}`
+do
+	# Change TAG Identifier
+	TAG=${DATE}_${num}
+	# Set Path To Mac Directory
+	MAC_DIR=Dropbox/Schork/JNJ11/Association/Poly_Train/${DATE}_${PHENO_NAME}/${num}/
+	# Create Mac Directory
+	mkdir ${MAC_DIR}
+	SCP_IN /projects/janssen/Poly_Train/${TAG}_${PHENO_NAME}/*jpeg ${MAC_DIR}
+done
 
 #########################################################################
 ## LOAD DATA ############################################################
 #########################################################################
 
-## Set Up Paths (Mac)
-PathToData <- "/Users/kstandis/Data/Burn/Poly_Train/20150112_Meta/Data/"
-PathToSave <- "/Users/kstandis/Data/Burn/Poly_Train/20150112_Meta/Plots/"
+DATE <- "20150119"
 
-## Load R Data
-DEL <- ACR <- list()
+## Set Up Paths (Mac)
+PathToData12 <- "/Users/kstandis/Data/Burn/Poly_Train/20150112_Meta/Data/"
+PathToData19 <- "/Users/kstandis/Data/Burn/Poly_Train/20150119_Meta/Data/"
+PathToSave <- paste("/Users/kstandis/Data/Burn/Poly_Train/",DATE,"_Meta/Plots/",sep="")
+
+## Load R Data (DEL - 1/12)
+DEL.12 <- list()
 for ( i in 1:10 ) {
-	PATH_DEL <- paste(PathToData,"20150105_",i,"_MOD_LT8_DEL_MNe_MN_DAS_BL_MN.Rdata",sep="")
-	PATH_ACR <- paste(PathToData,"20150105_",i,"_MOD_ACR50_100wk_AGE_SEX.Rdata",sep="")
+	PATH_DEL <- paste(PathToData12,"20150105_",i,"_MOD_LT8_DEL_MNe_MN_DAS_BL_MN.Rdata",sep="")
 	if ( file.exists(PATH_DEL) ) {
 		load( PATH_DEL )
-		DEL[[paste("Run",i,sep="_")]] <- COMPILE
+		DEL.12[[paste("Run",i,sep="_")]] <- COMPILE
 	}
+}
+## Load R Data (ACR - 1/12)
+ACR.12 <- list()
+for ( i in 1:10 ) {
+	PATH_ACR <- paste(PathToData12,"20150105_",i,"_MOD_ACR50_100wk_AGE_SEX.Rdata",sep="")
 	if ( file.exists(PATH_ACR) ) {
 		load( PATH_ACR )
-		ACR[[paste("Run",i,sep="_")]] <- COMPILE
+		ACR.12[[paste("Run",i,sep="_")]] <- COMPILE
+	}
+}
+## Load R Data (DEL - 1/12)
+DEL.19 <- list()
+for ( i in c(1,3:5,7,9:20) ) {
+	PATH_DEL <- paste(PathToData19,"20150119_",i,"_MOD_LT8_DEL_MNe_MN_DAS_BL_MN.Rdata",sep="")
+	if ( file.exists(PATH_DEL) ) {
+		load( PATH_DEL )
+		DEL.19[[paste("Run",i,sep="_")]] <- COMPILE
 	}
 }
 
 ## Specify Covariates for each Model
 COVS.del <- c("DAS_BL_MN")
 COVS.acr <- c("AGE","SEX")
+
+## Compile Runs for Analysis
+DEL <- DEL.19
+ACR <- ACR.12
 
 #########################################################################
 ## PULL OUT VARIANTS ####################################################
@@ -204,6 +253,17 @@ COMP.9.del.R2 <- COMP.9.del[order(COMP.9.del[,"R2_SUM"],decreasing=T),]
 COMP.1.del <- data.frame( COUNT=COUNT.1.del, MEAN_RNK=round(MEAN.1.del,2), STAT=round(STAT.1.del,2), R2_SUM=round(WT.1.del,2), RANKS.1.del )
 COMP.1.del <- COMP.1.del[order(COMP.1.del[,"STAT"]),]
 COMP.1.del.R2 <- COMP.1.del[order(COMP.1.del[,"R2_SUM"],decreasing=T),]
+
+## Heatmap
+library(gplots)
+COLS.list <- c("springgreen1","steelblue1","slateblue2","black")
+COLS <- colorRampPalette(COLS.list)(100)
+heatmap.2( t(data.matrix(COMP.1.del)), col=COLS, scale="none", dendrogram="none", Colv=F, Rowv=F, trace="none" )
+heatmap.2( t(data.matrix(COMP.9.del)), col=COLS, scale="none", dendrogram="none", Colv=F, Rowv=F, trace="none" )
+
+## Save Tables
+write.table( COMP.1.del, paste(PathToSave,"TAB_1_DEL.txt",sep=""), sep="\t",row.names=T,col.names=T,quote=F )
+write.table( COMP.9.del, paste(PathToSave,"TAB_9_DEL.txt",sep=""), sep="\t",row.names=T,col.names=T,quote=F )
 
 ##################################################
 ## BINARY: ACR50_100wk Results
