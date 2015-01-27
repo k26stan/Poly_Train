@@ -9,23 +9,23 @@
 ## Steps ##
 
 # Randomly Sample Patients for Training/Test Sets
-  # 70/30 -> Training/Test
+#   70/30 -> Training/Test
 # Run GWAS on Training Set
 # Pull out all variants beyond a given threshold
-  # p < 1e-5
+#   p < 1e-5
 # Collect Beta Values and Build Regression Model
 # Throw Test Set into Regression Model
-  # Calculate R2 & Adjusted R2
-    # R2 = 1 - (  sum( yobs - yexp )^2 / sum( yobs - ymn )^2 )
-    # adjR2 = 1 - (1-R2)(n-1)/(n-p)
-      # n = number of patients (in Test set)
-      # p = number of parameters
-  # *Could try running with subset of SNPs and find optimal model...
-    # May take a while
+#   Calculate R2 & Adjusted R2
+#     R2 = 1 - (  sum( yobs - yexp )^2 / sum( yobs - ymn )^2 )
+#     adjR2 = 1 - (1-R2)(n-1)/(n-p)
+#       n = number of patients (in Test set)
+#       p = number of parameters
+#   *Could try running with subset of SNPs and find optimal model...
+#     May take a while
 # Run this way a bunch of times
-  # Compile best predictors
-  # Determine optimal beta values (somehow?)
-  # Calculate R2/adjR2 for entire cohort using compiled model/predictors
+#   Compile best predictors
+#   Determine optimal beta values (somehow?)
+#   Calculate R2/adjR2 for entire cohort using compiled model/predictors
 
 ##########################################################################
 ## 1 ## Set up Paths #####################################################
