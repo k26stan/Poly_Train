@@ -165,7 +165,7 @@ echo \### 3 - `date` \###
 echo \### Determine/Adjust Variant File Formats \###
 echo `date` "3 - Determine/Adjust Variant File Formats" >> ${UPDATE_FILE}
 
-## Determing File Type and Converty to .bed File
+## Determing File Type and Convert to .bed File
 if [ ${VAR_FILE: -4} == ".vcf" ] ; then
         ${VCF_TOOLS} --plink --vcf ${VAR_FILE} --out ${ASSOC}_${VAR_FILE_NAME%%.vcf}
         VAR_FILE=${ASSOC}_${VAR_FILE_NAME%%.vcf}.ped
@@ -196,7 +196,7 @@ if [ $EIG_VEC = "F" ] ; then
 	${PLINK} --bfile ${VAR_FILE%%.bed} \
 	--pca header \
 	--allow-no-sex \
-	--out ${ASSOC}/${VAR_FILE%%.bed}
+	--out ${VAR_FILE%%.bed}
 	EIG_VEC=${VAR_FILE%%.bed}.eigenvec
 fi
 
