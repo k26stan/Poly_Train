@@ -315,7 +315,7 @@ abline( v=seq( 0,nrow(AUC.9),5), lty=2, col="grey50" )
 for ( i in 1:2 ) {
 	points( 1:nrow(AUC.9), AUC.9[,i], col=COLS[i], lty=LTYS[i], type="l", lwd=3 )
 }
-legend( quantile(XLIM,.8), quantile(YLIM,.9), legend=colnames(AUC.9), lty=LTYS, col=COLS, lwd=3 )
+legend( "bottomleft", legend=colnames(AUC.9), lty=LTYS, col=COLS, lwd=3 )
 dev.off()
 
 ###############################################################
@@ -459,7 +459,7 @@ abline( v=seq( 0,nrow(AUC.1),5), lty=2, col="grey50" )
 for ( i in 1:2 ) {
 	points( 1:nrow(AUC.1), AUC.1[,i], col=COLS[i], lty=LTYS[i], type="l", lwd=3 )
 }
-legend( XLIM[1], YLIM[2], legend=colnames(AUC.1), lty=LTYS, col=COLS, lwd=3 )
+legend( "bottomleft", legend=colnames(AUC.1), lty=LTYS, col=COLS, lwd=3 )
 dev.off()
 
 

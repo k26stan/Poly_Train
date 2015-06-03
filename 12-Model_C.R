@@ -308,7 +308,7 @@ abline( v=seq( 0,nrow(R2.9),5), lty=2, col="grey50" )
 for ( i in 1:4 ) {
 	points( 1:nrow(R2.9), R2.9[,i], col=COLS[i], lty=LTYS[i], type="l", lwd=3 )
 }
-legend( quantile(XLIM,.8), quantile(YLIM,.9), legend=colnames(R2.9), lty=LTYS, col=COLS, lwd=3 )
+legend( "bottomleft", legend=colnames(R2.9), lty=LTYS, col=COLS, lwd=3 )
 dev.off()
 
 # ## Heatmaps of Predictors
@@ -460,7 +460,7 @@ abline( v=seq( 0,nrow(R2.1),5), lty=2, col="grey50" )
 for ( i in 1:4 ) {
 	points( 1:nrow(R2.1), R2.1[,i], col=COLS[i], lty=LTYS[i], type="l", lwd=3 )
 }
-legend( quantile(XLIM,.01), quantile(YLIM,.9), legend=colnames(R2.1), lty=LTYS, col=COLS, lwd=3 )
+legend( "bottomleft", legend=colnames(R2.1), lty=LTYS, col=COLS, lwd=3 )
 dev.off()
 
 ###############################################################
